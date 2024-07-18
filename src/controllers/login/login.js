@@ -1,33 +1,20 @@
-import { Usuarios } from "../../models/usuario.model";
-import { Clientes } from "../../models/cliente.model";
-import { Contadoras } from "../../models/contadora.model";
+import { Clientes } from "../../models/cliente.model.js";
+import { Contadoras } from "../../models/contadora.model.js";
 import bcryptjs from "bcryptjs";
-import { Op } from "sequelize";
-import { generarJWT } from "../../utils/token";
+import { generarJWT } from "../../utils/token.js"; // asegurarse de que la extensión es correcta
 
 export const loginUsuario = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // Buscar en Usuarios
-    let usuario = await Usuarios.findOne({
+    let usuario = null;
+
+    // Buscar en Contadoras
+    usuario = await Contadoras.findOne({
       where: {
         email,
-        estado: true,
-        id_rol: {
-          [Op.ne]: 4,
-        },
       },
     });
-
-    // Si no se encuentra en Usuarios, buscar en Contadoras
-    if (!usuario) {
-      usuario = await Contadoras.findOne({
-        where: {
-          email,
-        },
-      });
-    }
 
     // Si no se encuentra en Contadoras, buscar en Clientes
     if (!usuario) {
@@ -52,7 +39,7 @@ export const loginUsuario = async (req, res) => {
     if (!validarPassword) {
       return res.status(400).json({
         status: "error",
-        message: "Ingreso invalido",
+        message: "Ingreso inválido",
       });
     }
 
@@ -61,9 +48,9 @@ export const loginUsuario = async (req, res) => {
 
     // Generar tokens
     const { token, refreshToken } = await generarJWT(
-      usuario.id_usuario || usuario.id_contadora || usuario.id_cliente,
+      usuario.id_contadora || usuario.id_cliente,
       usuario.email,
-      usuario.id_rol || usuario.rol || 'Cliente'
+      usuario.rol || 'Cliente'
     );
 
     res.status(200).json({
