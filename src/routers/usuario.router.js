@@ -25,12 +25,12 @@ import {
   obtenerUsuario,
   obtenerUsuariosTotales,
   crearUsuarioCompleto,
-  loginUsuario,
   getDNIContadora,
   cambioCalificacion,
   cargarDocumentos,
   obtenerDocumentos,
 } from "../controllers/usuarios.controller.js";
+import { loginUsuario } from "../controllers/login/login.js";
 
 const router = Express.Router();
 
